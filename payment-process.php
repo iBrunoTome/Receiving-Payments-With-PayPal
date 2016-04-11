@@ -1,6 +1,6 @@
 <?php
 
-	// just for debug and see what I'm receiving from $_POST
+	// Just for debug and see what I'm receiving from $_POST
 	$ret = file_put_contents('mydata.txt', "\n\n\n----------BEGIN----------", FILE_APPEND | LOCK_EX);
 	$ret = file_put_contents('mydata.txt', "\n\nIPN PAYPAL = FORM POST => " . date('Y-m-d H:i:s') . " => " . json_encode($_POST), FILE_APPEND | LOCK_EX);
 	
@@ -10,10 +10,10 @@
 	$cancel_url = 'YOUR_CANCEL_PAGE_RETURN';
 	$notify_url = 'PATH_TO_THIS_ARCHIVE';
 	
-	// Check if is an user making the REQUEST, or if it a RESPONSE from paypal
+	// Check if is an user making the REQUEST, or if it a RESPONSE from PayPal
 	if (!isset($_POST["txn_id"]) AND !isset($_POST["txn_type"])) {
 				
-		// Firstly append paypal account to querystring
+		// Firstly append PayPal account to querystring
 		$querystring = "?business=" . urlencode($paypal_email);
 				
 		// The item name and amount can be brought in dynamically by querying the $_POST['item_number'] variable.
@@ -28,19 +28,19 @@
 		$querystring .= "&rm=" . urlencode("0");
 		$querystring .= "&first_name=" . urlencode('NAME_OF_BUYER');
 		
-		// Append paypal return addresses
+		// Append PayPal return addresses
 		$querystring .= "&return=".urlencode(stripslashes($return_url));
 		$querystring .= "&cancel_return=".urlencode(stripslashes($cancel_url));
 		$querystring .= "&notify_url=".urlencode($notify_url);
 		
 		$ret = file_put_contents('mydata.txt', "\n\n-----------END-----------", FILE_APPEND | LOCK_EX);
 		
-		// Redirect to paypal IPN
+		// Redirect to PayPal IPN
 		header('location: https://www.paypal.com/cgi-bin/webscr' . $querystring);
 		exit;
 	} else {
 		
-		// Response from Paypal
+		// Response from PayPal
 	
 		// Read the post from PayPal system and add 'cmd'
 		$req = 'cmd=_notify-validate';
@@ -62,7 +62,7 @@
 		$data['custom'] 			= $_POST['custom'];
 		$data['payment_type'] 		= $_POST['payment_type'] == 'instant' ? utf8_decode('Saldo PayPal ou Cartão de Crédito') : $_POST['payment_type'];
 			
-		// post back to PayPal system to validate
+		// Post back to PayPal system to validate
 		$header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
 		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
 		$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
@@ -76,7 +76,7 @@
 			fputs($fp, $header . $req);
 			while (!feof($fp)) {
 				$res = fgets ($fp, 1024);
-				if (strcmp($res, "VERIFIED") == 0) { // The handshake with paypal was VERIFIED, save data in database
+				if (strcmp($res, "VERIFIED") == 0) { // The handshake with PayPal was VERIFIED, save data in database
 					
 					$ret = file_put_contents('mydata.txt', "\n\nIPN PAYPAL = VERIFICADO => " . date('Y-m-d H:i:s'), FILE_APPEND | LOCK_EX);
 					
@@ -109,4 +109,3 @@
 		fclose ($fp);
 	}
 ?>
-
